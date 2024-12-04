@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAINWH Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mainwh-page">
+        <header class="mainwh-header">
+            <button onclick="window.location.href='stores.html'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h2 class="page-title">Select Page</h2>
+        </header>
+
+        <div class="mainwh-actions">
+            <div class="nav-item" onclick="window.location.href='purchase-order.html'">
+                <div class="icon-container">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <span>Purchase Order</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='stock.html'">
+                <div class="icon-container">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <span>Stock</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='usage-order.html'">
+                <div class="icon-container">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <span>Usage</span>
+            </div>
+            <button class="action-btn" onclick="handleAction('MTF')">
+                <i class="fas fa-truck-loading"></i>
+                <h3>MTF</h3>
+            </button>
+            <button class="action-btn" onclick="handleAction('Receive PMR')">
+                <i class="fas fa-file-import"></i>
+                <h3>Receive PMR</h3>
+            </button>
+            
+            <button class="action-btn" onclick="handleAction('Technicians')">
+                <i class="fas fa-users-cog"></i>
+                <h3>Technicians</h3>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function handleAction(action) {
+            const button = event.currentTarget;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+                console.log(`${action} clicked`);
+            }, 200);
+        }
+    </script>
+</body>
+</html>

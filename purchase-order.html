@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Orders</title>
+     <link rel="stylesheet" href="css/purchase-order.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container purchase-page">
+        <!-- Header -->
+        <header class="page-header">
+            <button onclick="window.location.href='mainwh.html'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1>Purchase Orders</h1>
+            <button class="add-btn" onclick="openOrderModal()">
+                <i class="fas fa-plus"></i>
+                Add Order
+            </button>
+        </header>
+
+        <!-- Purchase Orders Table -->
+        <div class="table-container">
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>PO Number</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Supplier</th>
+                        <th>Items Count</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Add/Edit Order Modal -->
+        <div id="orderModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeOrderModal()">&times;</span>
+                <h2>New Purchase Order</h2>
+                <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="poNumber">PO Number:</label>
+                            <input type="text" id="poNumber" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderDate">Date:</label>
+                            <input type="text" id="orderDate" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderTime">Time:</label>
+                            <input type="text" id="orderTime" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="supplier">Supplier:</label>
+                        <input type="text" id="supplier" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes:</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <!-- Items Table -->
+                    <div class="items-table-container">
+                        <h3>Order Items</h3>
+                        <table id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <button type="button" class="add-item-btn" onclick="openItemSelector()">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Save Order</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Item Selector Modal -->
+        <div id="itemSelectorModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeItemSelector()">&times;</span>
+                <h2>Select Items</h2>
+                <div class="search-box">
+                    <input type="text" id="itemSearch" placeholder="Search items...">
+                </div>
+                <div class="items-list" id="itemsList">
+                    <!-- Items will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- إضافة نافذة عرض الفاتورة -->
+        <div id="viewOrderModal" class="modal">
+            <div class="modal-content invoice-content">
+                <span class="close" onclick="closeViewModal()">&times;</span>
+                <div class="invoice-container" id="invoicePrint">
+                    <!-- رأس الفاتورة -->
+                    <div class="invoice-header">
+                        <img src="images/logo_orkin.png" alt="Orkin Logo" class="invoice-logo">
+                        <div class="company-info">
+                            <h2>Orkin Company</h2>
+                            <p>123 Street Name, City, Country</p>
+                            <p>Phone: +123 456 789</p>
+                            <p>Email: info@orkin.com</p>
+                        </div>
+                    </div>
+
+                    <!-- معلومات الفاتورة -->
+                    <div class="invoice-info">
+                        <div class="po-details">
+                            <h1>Purchase Order</h1>
+                            <div class="po-number" id="viewPoNumber"></div>
+                            <div class="po-date" id="viewPoDate"></div>
+                        </div>
+                        <div class="supplier-info" id="viewSupplier">
+                            <!-- معلومات المورد -->
+                        </div>
+                    </div>
+
+                    <!-- جدول المنتجات -->
+                    <div class="invoice-items">
+                        <table id="viewItemsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Unit</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <!-- الملاحظات -->
+                    <div class="invoice-notes" id="viewNotes">
+                        <!-- الملاحظات -->
+                    </div>
+
+                    <!-- التوقيع -->
+                    <div class="invoice-footer">
+                        <div class="signature-section">
+                            <div class="signature-box">
+                                <p>Prepared By: ________________</p>
+                            </div>
+                            <div class="signature-box">
+                                <p>Approved By: ________________</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- أزرار التحكم -->
+                <div class="invoice-actions">
+                    <button onclick="printInvoice()" class="print-btn">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                    <button onclick="downloadPDF()" class="pdf-btn">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentItems = [];
+        
+        // Generate PO Number
+        function generatePONumber() {
+            const orders = JSON.parse(localStorage.getItem('purchaseOrders')) || [];
+            const number = orders.length + 1;
+            return 'PO' + String(number).padStart(3, '0');
+        }
+
+        // Load Items from items.html
+        function loadItems() {
+            const items = JSON.parse(localStorage.getItem('items')) || [];
+            const itemsList = document.getElementById('itemsList');
+            itemsList.innerHTML = '';
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'item-card';
+                div.innerHTML = `
+                    <img src="${item.image || 'placeholder.png'}" alt="${item.name}">
+                    <div class="item-info">
+                        <h4>${item.name}</h4>
+                        <p>${item.description}</p>
+                    </div>
+                    <button onclick="addItemToOrder('${item.id}', '${item.name}', '${item.unit}')">
+                        Add
+                    </button>
+                `;
+                itemsList.appendChild(div);
+            });
+        }
+
+        // Add Item to Order
+        function addItemToOrder(itemId, itemName, unit) {
+            const tbody = document.querySelector('#itemsTable tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${itemName}</td>
+                <td><input type="number" min="1" value="1" class="quantity-input"></td>
+                <td>${unit}</td>
+                <td>
+                    <button type="button" class="remove-btn" onclick="removeItem(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(row);
+            closeItemSelector();
+        }
+
+        // Remove Item from Order
+        function removeItem(button) {
+            button.closest('tr').remove();
+        }
+
+        // Handle Order Submit
+        function handleOrderSubmit(event) {
+            event.preventDefault();
+            
+            const items = [];
+            document.querySelectorAll('#itemsTable tbody tr').forEach(row => {
+                items.push({
+                    name: row.cells[0].textContent,
+                    quantity: row.querySelector('.quantity-input').value,
+                    unit: row.cells[2].textContent
+                });
+            });
+
+            const orderData = {
+                poNumber: document.getElementById('poNumber').value,
+                date: document.getElementById('orderDate').value,
+                time: document.getElementById('orderTime').value,
+                supplier: document.getElementById('supplier').value,
+                notes: document.getElementById('notes').value,
+                items: items
+            };
+
+            // Save order
+            const orders = JSON.parse(localStorage.getItem('purchaseOrders')) || [];
+            orders.push(orderData);
+            localStorage.setItem('purchaseOrders', JSON.stringify(orders));
+
+            closeOrderModal();
+            loadOrders();
+        }
+
+        // Load Orders
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('purchaseOrders')) || [];
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = '';
+
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.poNumber}</td>
+                    <td>${order.date}</td>
+                    <td>${order.time}</td>
+                    <td>${order.supplier}</td>
+                    <td>${order.items.length}</td>
+                    <td>${order.notes}</td>
+                    <td>
+                        <button class="view-btn" onclick="viewOrder('${order.poNumber}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Modal Functions
+        function openOrderModal() {
+            const modal = document.getElementById('orderModal');
+            modal.style.display = 'block';
+            
+            // Set current date and time
+            const now = new Date();
+            document.getElementById('poNumber').value = generatePONumber();
+            document.getElementById('orderDate').value = now.toLocaleDateString();
+            document.getElementById('orderTime').value = now.toLocaleTimeString();
+            
+            // Clear previous items
+            document.querySelector('#itemsTable tbody').innerHTML = '';
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+            document.getElementById('orderForm').reset();
+        }
+
+        function openItemSelector() {
+            document.getElementById('itemSelectorModal').style.display = 'block';
+            loadItems();
+        }
+
+        function closeItemSelector() {
+            document.getElementById('itemSelectorModal').style.display = 'none';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+        });
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // تحديث دالة عرض الفاتورة
+        function viewOrder(poNumber) {
+            const orders = JSON.parse(localStorage.getItem('purchaseOrders')) || [];
+            const order = orders.find(o => o.poNumber === poNumber);
+            
+            if (order) {
+                // تعبئة معلومات الفاتورة
+                document.getElementById('viewPoNumber').textContent = `PO Number: ${order.poNumber}`;
+                // فصل التاريخ عن الوقت
+                document.getElementById('viewPoDate').innerHTML = `
+                    <div>Date: ${order.date}</div>
+                    <div>Time: ${order.time}</div>
+                `;
+                
+                document.getElementById('viewSupplier').innerHTML = `
+                    <h3>Supplier</h3>
+                    <p>${order.supplier}</p>
+                `;
+                
+                // تعبئة جدول المنتجات
+                const tbody = document.querySelector('#viewItemsTable tbody');
+                tbody.innerHTML = '';
+                order.items.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.unit}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                // إضافة الملاحظات
+                document.getElementById('viewNotes').innerHTML = `
+                    <h3>Notes</h3>
+                    <p>${order.notes || 'No notes'}</p>
+                `;
+                
+                // عرض النافذة
+                document.getElementById('viewOrderModal').style.display = 'block';
+            }
+        }
+
+        // دالة الطباعة
+        function printInvoice() {
+            const printContent = document.getElementById('invoicePrint');
+            const originalContents = document.body.innerHTML;
+            
+            document.body.innerHTML = printContent.innerHTML;
+            
+            window.print();
+            
+            document.body.innerHTML = originalContents;
+            
+            // إعادة تحميل الصفحة بعد الطباعة
+            location.reload();
+        }
+
+        // إغلاق نافذة عرض الفاتورة
+        function closeViewModal() {
+            document.getElementById('viewOrderModal').style.display = 'none';
+        }
+
+        // دالة تحميل PDF
+        function downloadPDF() {
+            const element = document.getElementById('invoicePrint');
+            const options = {
+                margin: 10,
+                filename: `purchase-order-${document.getElementById('viewPoNumber').textContent.split(': ')[1]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // إخفاء أزرار التحكم مؤقتاً
+            const actions = document.querySelector('.invoice-actions');
+            actions.style.display = 'none';
+
+            // تحويل إلى PDF وتحميله
+            html2pdf().from(element).set(options).save().then(() => {
+                // إعادة إظهار أزرار التحكم
+                actions.style.display = 'block';
+            });
+        }
+    </script>
+</body>
+</html>

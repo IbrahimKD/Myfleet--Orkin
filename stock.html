@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Management</title>
+    <link rel="stylesheet" href="css/stock.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container stock-page">
+        <!-- Header -->
+        <header class="page-header">
+            <button onclick="window.location.href='mainwh.html'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1>Stock Management</h1>
+        </header>
+
+        <!-- Search and Filter -->
+        <div class="search-filter">
+            <input type="text" id="searchBox" placeholder="Search by item name..." oninput="filterItems()">
+            <div class="category-buttons">
+                <button onclick="filterByCategory('Chemical')">Chemical</button>
+                <button onclick="filterByCategory('Consumables')">Consumables</button>
+                <button onclick="filterByCategory('Equipment')">Equipment</button>
+            </div>
+        </div>
+
+        <!-- Stock Table -->
+        <div class="table-container">
+            <table id="stockTable">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Name</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Stock items will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // تحميل الكميات من الطلبات
+        function loadStock() {
+            const orders = JSON.parse(localStorage.getItem('purchaseOrders')) || [];
+            const stock = {};
+
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    if (!stock[item.name]) {
+                        stock[item.name] = {
+                            code: item.code,
+                            name: item.name,
+                            category: item.category,
+                            quantity: 0,
+                            unit: item.unit
+                        };
+                    }
+                    stock[item.name].quantity += parseInt(item.quantity, 10);
+                });
+            });
+
+            const tbody = document.querySelector('#stockTable tbody');
+            tbody.innerHTML = '';
+
+            Object.values(stock).forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.unit}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // دالة البحث
+        function filterItems() {
+            const searchValue = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#stockTable tbody tr');
+
+            rows.forEach(row => {
+                const itemName = row.cells[1].textContent.toLowerCase();
+                row.style.display = itemName.includes(searchValue) ? '' : 'none';
+            });
+        }
+
+        // دالة التصفية حسب الفئة
+        function filterByCategory(category) {
+            const rows = document.querySelectorAll('#stockTable tbody tr');
+
+            rows.forEach(row => {
+                const itemCategory = row.cells[2].textContent;
+                row.style.display = itemCategory === category ? '' : 'none';
+            });
+        }
+
+        // تحميل الكميات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', loadStock);
+    </script>
+</body>
+</html>

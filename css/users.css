@@ -1,0 +1,267 @@
+/* Main Container */
+.users-page {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header Styles */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-btn, .add-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.back-btn {
+    background: #f1f2f6;
+    color: #2d3436;
+}
+
+.add-btn {
+    background: #0984e3;
+    color: white;
+}
+
+.back-btn:hover {
+    background: #dfe4ea;
+}
+
+.add-btn:hover {
+    background: #0773c5;
+    transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    background: white;
+    margin: 5% auto;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #636e72;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #d63031;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2d3436;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #dfe6e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #0984e3;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.1);
+}
+
+.form-group small {
+    display: block;
+    margin-top: 5px;
+    color: #636e72;
+    font-size: 0.8rem;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 12px;
+    background: #0984e3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #0773c5;
+    transform: translateY(-2px);
+}
+
+/* Table Styles */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #dfe6e9;
+}
+
+th {
+    background: #f5f6fa;
+    color: #2d3436;
+    font-weight: 600;
+}
+
+tr:hover {
+    background: #f8f9fa;
+}
+
+/* Password Field in Table */
+td input[type="password"] {
+    border: none;
+    background: transparent;
+    font-family: monospace;
+    padding: 5px;
+    width: 120px;
+}
+
+.show-password-btn {
+    background: none;
+    border: none;
+    color: #636e72;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 5px;
+}
+
+.show-password-btn:hover {
+    color: #0984e3;
+}
+
+/* Action Buttons */
+.action-btn {
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: all 0.3s ease;
+}
+
+.action-btn.edit {
+    background: #00b894;
+    color: white;
+}
+
+.action-btn.delete {
+    background: #d63031;
+    color: white;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 20px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    th, td {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .users-page {
+        padding: 10px;
+    }
+
+    .back-btn, .add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px;
+    }
+}

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usage Orders</title>
+    <link rel="stylesheet" href="css/purchase-order.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container usage-page">
+        <!-- Header -->
+        <header class="page-header">
+            <button onclick="window.location.href='mainwh.html'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1>Usage Orders</h1>
+            <button class="add-btn" onclick="openOrderModal()">
+                <i class="fas fa-plus"></i>
+                Add Usage
+            </button>
+        </header>
+
+        <!-- Usage Orders Table -->
+        <div class="table-container">
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Usage Number</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Items Count</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- Add Usage Modal -->
+        <div id="orderModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeOrderModal()">&times;</span>
+                <h2>New Usage Order</h2>
+                <form id="orderForm" onsubmit="handleOrderSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="usageNumber">Usage Number:</label>
+                            <input type="text" id="usageNumber" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderDate">Date:</label>
+                            <input type="text" id="orderDate" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderTime">Time:</label>
+                            <input type="text" id="orderTime" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes:</label>
+                        <textarea id="notes" rows="3"></textarea>
+                    </div>
+                    
+                    <!-- Items Table -->
+                    <div class="items-table-container">
+                        <h3>Usage Items</h3>
+                        <table id="itemsTable">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Available in Stock</th>
+                                    <th>Quantity to Use</th>
+                                    <th>Unit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                        <button type="button" class="add-item-btn" onclick="openItemSelector()">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Save Usage</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Item Selector Modal -->
+        <div id="itemSelectorModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeItemSelector()">&times;</span>
+                <h2>Select Items from Stock</h2>
+                <div class="search-box">
+                    <input type="text" id="itemSearch" placeholder="Search items..." oninput="filterStockItems()">
+                </div>
+                <div class="stock-items-list" id="stockItemsList">
+                    <!-- Stock items will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentItems = [];
+
+        // توليد رقم الاستخدام
+        function generateUsageNumber() {
+            const orders = JSON.parse(localStorage.getItem('usageOrders')) || [];
+            const number = orders.length + 1;
+            return `US${String(number).padStart(3, '0')}`;
+        }
+
+        // تحميل المنتجات من المخزون
+        function loadStockItems() {
+            const stock = JSON.parse(localStorage.getItem('stock')) || [];
+            const itemsList = document.getElementById('stockItemsList');
+            itemsList.innerHTML = '';
+
+            stock.forEach(item => {
+                if (item.quantity > 0) {
+                    const itemCard = document.createElement('div');
+                    itemCard.className = 'stock-item-card';
+                    itemCard.innerHTML = `
+                        <div class="item-info">
+                            <h4>${item.name}</h4>
+                            <p>Available: ${item.quantity} ${item.unit}</p>
+                        </div>
+                        <button type="button" onclick="addItemToUsage('${item.name}', ${item.quantity}, '${item.unit}')">
+                            Select
+                        </button>
+                    `;
+                    itemsList.appendChild(itemCard);
+                }
+            });
+        }
+
+        // إضافة منتج للطلب
+        function addItemToUsage(itemName, availableQuantity, unit) {
+            if (!currentItems.includes(itemName)) {
+                const tbody = document.querySelector('#itemsTable tbody');
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${itemName}</td>
+                    <td>${availableQuantity} ${unit}</td>
+                    <td>
+                        <input type="number" min="1" max="${availableQuantity}" 
+                               value="1" onchange="validateQuantity(this, ${availableQuantity})" required>
+                    </td>
+                    <td>${unit}</td>
+                    <td>
+                        <button type="button" onclick="removeItem(this)" class="remove-btn">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+                currentItems.push(itemName);
+                closeItemSelector();
+            }
+        }
+
+        // فتح نافذة إضافة طلب جديد
+        function openOrderModal() {
+            const modal = document.getElementById('orderModal');
+            modal.style.display = 'block';
+            
+            const now = new Date();
+            document.getElementById('usageNumber').value = generateUsageNumber();
+            document.getElementById('orderDate').value = now.toLocaleDateString();
+            document.getElementById('orderTime').value = now.toLocaleTimeString();
+            
+            document.getElementById('orderForm').reset();
+            document.querySelector('#itemsTable tbody').innerHTML = '';
+            currentItems = [];
+        }
+
+        // إغلاق نافذة إضافة طلب
+        function closeOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+        }
+
+        // فتح نافذة اختيار العناصر
+        function openItemSelector() {
+            document.getElementById('itemSelectorModal').style.display = 'block';
+            loadStockItems();
+        }
+
+        // إغلاق نافذة اختيار العناصر
+        function closeItemSelector() {
+            document.getElementById('itemSelectorModal').style.display = 'none';
+        }
+
+        // حذف عنصر من الجدول
+        function removeItem(button) {
+            const row = button.closest('tr');
+            const itemName = row.cells[0].textContent;
+            currentItems = currentItems.filter(item => item !== itemName);
+            row.remove();
+        }
+
+        // تصفية العناصر
+        function filterStockItems() {
+            const searchText = document.getElementById('itemSearch').value.toLowerCase();
+            const items = document.querySelectorAll('.stock-item-card');
+            
+            items.forEach(item => {
+                const itemName = item.querySelector('h4').textContent.toLowerCase();
+                item.style.display = itemName.includes(searchText) ? '' : 'none';
+            });
+        }
+
+        // حفظ الطلب
+        function handleOrderSubmit(event) {
+            event.preventDefault();
+            
+            const items = [];
+            const rows = document.querySelectorAll('#itemsTable tbody tr');
+            
+            rows.forEach(row => {
+                items.push({
+                    name: row.cells[0].textContent,
+                    quantity: parseInt(row.cells[2].querySelector('input').value),
+                    unit: row.cells[3].textContent
+                });
+            });
+
+            const usageData = {
+                usageNumber: document.getElementById('usageNumber').value,
+                date: document.getElementById('orderDate').value,
+                time: document.getElementById('orderTime').value,
+                notes: document.getElementById('notes').value,
+                items: items
+            };
+
+            // حفظ الطلب
+            const usageOrders = JSON.parse(localStorage.getItem('usageOrders')) || [];
+            usageOrders.push(usageData);
+            localStorage.setItem('usageOrders', JSON.stringify(usageOrders));
+
+            // تحديث المخزون
+            updateStockQuantities(items);
+
+            closeOrderModal();
+            loadOrders();
+        }
+
+        // تحديث كميات المخزون
+        function updateStockQuantities(usedItems) {
+            const stock = JSON.parse(localStorage.getItem('stock')) || [];
+            
+            usedItems.forEach(usedItem => {
+                const stockItem = stock.find(item => item.name === usedItem.name);
+                if (stockItem) {
+                    stockItem.quantity = Math.max(0, stockItem.quantity - usedItem.quantity);
+                }
+            });
+            
+            localStorage.setItem('stock', JSON.stringify(stock));
+        }
+
+        // تحميل الطلبات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+            const now = new Date();
+            document.getElementById('usageNumber').value = generateUsageNumber();
+            document.getElementById('orderDate').value = now.toLocaleDateString();
+            document.getElementById('orderTime').value = now.toLocaleTimeString();
+        });
+
+        // إغلاق النوافذ المنبثقة عند النقر خارجها
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        function saveOrderAsPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // إضافة الشعار
+            const img = new Image();
+            img.src = 'path/to/logo_orkin.png'; // تأكد من وضع المسار الصحيح للصورة
+            img.onload = function() {
+                doc.addImage(img, 'PNG', 10, 10, 50, 20);
+
+                // إضافة تفاصيل الطلب
+                const usageNumber = document.getElementById('usageNumber').value;
+                const date = document.getElementById('orderDate').value;
+                const time = document.getElementById('orderTime').value;
+                const notes = document.getElementById('notes').value;
+
+                doc.setFontSize(12);
+                doc.text(`Usage Number: ${usageNumber}`, 10, 40);
+                doc.text(`Date: ${date}`, 10, 50);
+                doc.text(`Time: ${time}`, 10, 60);
+                doc.text(`Notes: ${notes}`, 10, 70);
+
+                // إضافة العناصر
+                const rows = document.querySelectorAll('#itemsTable tbody tr');
+                let y = 80;
+                rows.forEach(row => {
+                    const itemName = row.cells[0].textContent;
+                    const quantity = row.cells[2].querySelector('input').value;
+                    const unit = row.cells[3].textContent;
+                    doc.text(`${itemName}: ${quantity} ${unit}`, 10, y);
+                    y += 10;
+                });
+
+                // حفظ الملف
+                doc.save(`UsageOrder_${usageNumber}.pdf`);
+            };
+        }
+
+        // دالة تحميل الطلبات
+        function loadOrders() {
+            const orders = JSON.parse(localStorage.getItem('usageOrders')) || [];
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = '';
+
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.usageNumber}</td>
+                    <td>${order.date}</td>
+                    <td>${order.time}</td>
+                    <td>${order.items.length}</td>
+                    <td>${order.notes || '-'}</td>
+                    <td>
+                        <button onclick="viewOrder('${order.usageNumber}')" class="action-btn view">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="deleteOrder('${order.usageNumber}')" class="action-btn delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // دالة عرض تفاصيل الطلب
+        function viewOrder(usageNumber) {
+            const orders = JSON.parse(localStorage.getItem('usageOrders')) || [];
+            const order = orders.find(o => o.usageNumber === usageNumber);
+            
+            if (order) {
+                alert(`
+                    Usage Order Details:
+                    Number: ${order.usageNumber}
+                    Date: ${order.date}
+                    Time: ${order.time}
+                    Items: ${order.items.map(item => `\n- ${item.name}: ${item.quantity} ${item.unit}`)}
+                    Notes: ${order.notes || 'No notes'}
+                `);
+            }
+        }
+
+        // دالة حذف طلب
+        function deleteOrder(usageNumber) {
+            if (confirm('Are you sure you want to delete this usage order?')) {
+                const orders = JSON.parse(localStorage.getItem('usageOrders')) || [];
+                const updatedOrders = orders.filter(order => order.usageNumber !== usageNumber);
+                localStorage.setItem('usageOrders', JSON.stringify(updatedOrders));
+                loadOrders();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stores Management</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <button onclick="window.location.href='index.html'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1>Stores Management</h1>
+            <button id="addStoreBtn" class="add-btn">
+                <span class="btn-icon">+</span>
+                Add Store
+            </button>
+        </header>
+
+        <!-- Modal Form -->
+        <div id="storeModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Add New Store</h2>
+                <form id="storeForm">
+                    <div class="form-group">
+                        <label for="storeName">Store Name:</label>
+                        <input type="text" id="storeName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location:</label>
+                        <input type="text" id="location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userName">User Name:</label>
+                        <input type="text" id="userName" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Store</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Stores Grid -->
+        <div id="storesContainer" class="stores-grid">
+            <!-- MAINWH Button (Fixed) -->
+            <div class="store-btn mainwh-btn" onclick="window.location.href='mainwh.html'">
+                <i class="fas fa-warehouse"></i>
+                <div class="store-info">
+                    <h3>MAINWH</h3>
+                    <p>Main Warehouse</p>
+                </div>
+            </div>
+            <!-- Other stores will be added here dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // Get DOM elements
+        const modal = document.getElementById('storeModal');
+        const addBtn = document.getElementById('addStoreBtn');
+        const closeBtn = document.getElementsByClassName('close')[0];
+        const form = document.getElementById('storeForm');
+        const storesContainer = document.getElementById('storesContainer');
+
+        // Show modal
+        addBtn.onclick = function() {
+            modal.classList.add('show');
+        }
+
+        // Close modal
+        closeBtn.onclick = function() {
+            modal.classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        // Handle form submission
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            
+            const storeName = document.getElementById('storeName').value;
+            const location = document.getElementById('location').value;
+            const userName = document.getElementById('userName').value;
+            
+            const storeButton = document.createElement('div');
+            storeButton.className = 'store-btn';
+            storeButton.style.opacity = '0';
+            storeButton.innerHTML = `
+                <i class="fas fa-store"></i>
+                <div class="store-info">
+                    <h3>${storeName}</h3>
+                    <p>${userName}</p>
+                </div>
+            `;
+            
+            storeButton.onclick = function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    window.location.href = `store.html?name=${encodeURIComponent(storeName)}`;
+                }, 200);
+            };
+            
+            storesContainer.appendChild(storeButton);
+            
+            // Animate new store button
+            setTimeout(() => {
+                storeButton.style.opacity = '1';
+            }, 50);
+            
+            // Save to localStorage
+            saveStores();
+            
+            // Clear form and close modal
+            form.reset();
+            modal.classList.remove('show');
+        }
+
+        // Save stores to localStorage
+        function saveStores() {
+            const stores = [];
+            const storeElements = document.querySelectorAll('.store-btn:not(.mainwh-btn)');
+            
+            storeElements.forEach(store => {
+                stores.push({
+                    name: store.querySelector('h3').textContent,
+                    user: store.querySelector('p').textContent
+                });
+            });
+            
+            localStorage.setItem('stores', JSON.stringify(stores));
+        }
+
+        // Load stores from localStorage
+        function loadStores() {
+            const stores = JSON.parse(localStorage.getItem('stores')) || [];
+            
+            stores.forEach(store => {
+                const storeButton = document.createElement('div');
+                storeButton.className = 'store-btn';
+                storeButton.innerHTML = `
+                    <i class="fas fa-store"></i>
+                    <div class="store-info">
+                        <h3>${store.name}</h3>
+                        <p>${store.user}</p>
+                    </div>
+                `;
+                
+                storeButton.onclick = function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        window.location.href = `store.html?name=${encodeURIComponent(store.name)}`;
+                    }, 200);
+                };
+                
+                storesContainer.appendChild(storeButton);
+            });
+        }
+
+        // Load stores when page loads
+        document.addEventListener('DOMContentLoaded', loadStores);
+    </script>
+</body>
+</html>

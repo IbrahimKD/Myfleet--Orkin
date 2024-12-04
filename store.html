@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Details</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- إضافة Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container store-page">
+        <header class="store-header">
+            <h1 id="storeName"></h1>
+            <button onclick="window.location.href='stores.html'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+        </header>
+
+        <div class="store-actions">
+            <button class="action-btn" onclick="handleAction('Stock')">
+                <i class="fas fa-box"></i>
+                <h3>Stock</h3>
+            </button>
+            <button class="action-btn" onclick="handleAction('Usage')">
+                <i class="fas fa-chart-line"></i>
+                <h3>Usage</h3>
+            </button>
+            <button class="action-btn" onclick="handleAction('PMR')">
+                <i class="fas fa-file-alt"></i>
+                <h3>PMR</h3>
+            </button>
+            <button class="action-btn" onclick="handleAction('Receive MTF')">
+                <i class="fas fa-truck-loading"></i>
+                <h3>Receive MTF</h3>
+            </button>
+            <button class="action-btn" onclick="handleAction('Technicians')">
+                <i class="fas fa-users-cog"></i>
+                <h3>Technicians</h3>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Get store name from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const storeName = urlParams.get('name');
+        document.getElementById('storeName').textContent = storeName;
+        document.title = `${storeName} - Store Details`;
+
+        function handleAction(action) {
+            const button = event.currentTarget;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+                console.log(`${action} clicked`);
+            }, 200);
+        }
+
+        // Add loading animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const storeName = document.getElementById('storeName');
+            storeName.style.opacity = '0';
+            storeName.style.transform = 'translateY(-20px)';
+            
+            setTimeout(() => {
+                storeName.style.opacity = '1';
+                storeName.style.transform = 'translateY(0)';
+                storeName.style.transition = 'all 0.5s ease-out';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
