@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTF Management</title>
+    <link rel="stylesheet" href="css/mtf.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <button onclick="window.location.href='mainwh.html'" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+            <h1>MTF Management</h1>
+            <button onclick="showNewMTFModal()" class="add-btn">
+                <i class="fas fa-plus"></i>
+                New MTF
+            </button>
+        </header>
+
+        <div class="table-container">
+            <table id="mtfTable">
+                <thead>
+                    <tr>
+                        <th>MTF Number</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Store</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- سيتم ملؤها ديناميكياً -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal for New MTF -->
+    <div id="mtfModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New MTF</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="mtfForm" onsubmit="saveMTF(event)">
+                <div class="form-group">
+                    <label>MTF Number:</label>
+                    <input type="text" id="mtfNumber" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Date:</label>
+                    <input type="text" id="currentDate" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Time:</label>
+                    <input type="text" id="currentTime" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Store:</label>
+                    <select id="storeSelect" required>
+                        <!-- سيتم ملؤها ديناميكياً -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes:</label>
+                    <textarea id="notes" rows="3"></textarea>
+                </div>
+                
+                <div class="items-section">
+                    <h3>Items</h3>
+                    <button type="button" onclick="showItemSelector()" class="add-item-btn">
+                        <i class="fas fa-plus"></i> Add Item
+                    </button>
+                    <table id="selectedItemsTable">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Available Quantity</th>
+                                <th>Required Quantity</th>
+                                <th>Unit</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Send MTF</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Item Selection -->
+    <div id="itemSelectorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Select Items</h2>
+                <span class="close" onclick="closeItemSelector()">&times;</span>
+            </div>
+            <div class="search-box">
+                <input type="text" id="itemSearch" onkeyup="filterItems()" placeholder="Search items...">
+            </div>
+            <div class="items-grid" id="itemsGrid">
+                <!-- سيتم ملؤها ديناميكياً -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/mtf.js"></script>
+</body>
+</html>

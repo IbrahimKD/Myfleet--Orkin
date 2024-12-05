@@ -55,8 +55,8 @@
                         <select id="category" required>
                             <option value="">Select Category</option>
                             <option value="category1">Chemical</option>
-                            <option value="category2">Consumables</option>
-                            <option value="category3">Equipment</option>
+                            <option value="category2">Equipment</option>
+                            <option value="category3">Consumables</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -114,7 +114,7 @@
                             <span>${item.name}</span>
                         </div>
                     </td>
-                    <td>${item.category}</td>
+                    <td>${mapCategory(item.category)}</td>
                     <td>${item.description}</td>
                     <td>${item.unit}</td>
                     <td>
@@ -128,6 +128,20 @@
                 `;
                 tbody.appendChild(row);
             });
+        }
+
+        // دالة لتحويل الفئات
+        function mapCategory(category) {
+            switch (category) {
+                case 'category1':
+                    return 'Chemical';
+                case 'category2':
+                    return 'Equipment';
+                case 'category3':
+                    return 'Consumables';
+                default:
+                    return category; // في حال كانت الفئة غير معروفة
+            }
         }
 
         // Handle form submission

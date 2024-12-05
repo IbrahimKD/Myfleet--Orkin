@@ -242,11 +242,12 @@
         function handleOrderSubmit(event) {
             event.preventDefault();
             
+            // جمع بيانات الطلب
             const items = [];
             document.querySelectorAll('#itemsTable tbody tr').forEach(row => {
                 items.push({
                     name: row.cells[0].textContent,
-                    quantity: row.querySelector('.quantity-input').value,
+                    quantity: parseInt(row.querySelector('.quantity-input').value),
                     unit: row.cells[2].textContent
                 });
             });
@@ -260,13 +261,41 @@
                 items: items
             };
 
-            // Save order
+            // حفظ طلب الشراء
             const orders = JSON.parse(localStorage.getItem('purchaseOrders')) || [];
             orders.push(orderData);
             localStorage.setItem('purchaseOrders', JSON.stringify(orders));
 
+            // تحديث المخزون
+            updateStock(items);
+
             closeOrderModal();
             loadOrders();
+        }
+
+        function updateStock(purchasedItems) {
+            // جلب المخزون الحالي
+            let stock = JSON.parse(localStorage.getItem('stock')) || [];
+            
+            // تحديث الكميات
+            purchasedItems.forEach(purchasedItem => {
+                const existingItem = stock.find(item => item.name === purchasedItem.name);
+                
+                if (existingItem) {
+                    // تحديث الكمية للعنصر الموجود
+                    existingItem.quantity = (parseInt(existingItem.quantity) || 0) + parseInt(purchasedItem.quantity);
+                } else {
+                    // إضافة عنصر جديد للمخزون
+                    stock.push({
+                        name: purchasedItem.name,
+                        quantity: parseInt(purchasedItem.quantity),
+                        unit: purchasedItem.unit
+                    });
+                }
+            });
+
+            // حفظ المخزون المحدث
+            localStorage.setItem('stock', JSON.stringify(stock));
         }
 
         // Load Orders

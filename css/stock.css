@@ -93,3 +93,16 @@ th {
     background: #f5f6fa;
     font-weight: 600;
 }
+
+.item-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.item-thumbnail {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+}

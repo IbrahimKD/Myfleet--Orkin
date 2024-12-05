@@ -181,86 +181,127 @@ body {
 .table-container {
     background: white;
     border-radius: 12px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    margin-top: 20px;
 }
 
-table {
+#itemsTable {
     width: 100%;
     border-collapse: collapse;
+    font-size: 0.95rem;
 }
 
-th {
+#itemsTable th {
     background: #f8f9fa;
-    padding: 16px;
-    text-align: left;
+    color: #2d3436;
     font-weight: 600;
-    color: var(--text-color);
-    border-bottom: 2px solid var(--border-color);
+    padding: 15px 20px;
+    text-align: left;
+    border-bottom: 2px solid #dfe6e9;
+    white-space: nowrap;
 }
 
-td {
-    padding: 16px;
-    border-bottom: 1px solid var(--border-color);
+#itemsTable td {
+    padding: 12px 20px;
+    border-bottom: 1px solid #dfe6e9;
+    color: #636e72;
+    vertical-align: middle;
 }
 
-tbody tr:hover {
+/* ترتيب عرض الأعمدة */
+#itemsTable th:nth-child(1), /* Code */
+#itemsTable td:nth-child(1) {
+    width: 15%;
+}
+
+#itemsTable th:nth-child(2), /* Name */
+#itemsTable td:nth-child(2) {
+    width: 30%;
+}
+
+#itemsTable th:nth-child(3), /* Category */
+#itemsTable td:nth-child(3) {
+    width: 20%;
+}
+
+#itemsTable th:nth-child(4), /* Unit */
+#itemsTable td:nth-child(4) {
+    width: 15%;
+}
+
+#itemsTable th:nth-child(5), /* Actions */
+#itemsTable td:nth-child(5) {
+    width: 20%;
+    text-align: center;
+}
+
+/* تنسيق صف الجدول عند التحويم */
+#itemsTable tbody tr:hover {
     background: #f8f9fa;
 }
 
-/* Action Buttons in Table */
+/* تنسيق أزرار العمليات */
+.actions-container {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
 .action-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
     transition: all 0.3s ease;
-    margin: 0 4px;
-    color: white;
+}
+
+.action-btn i {
+    font-size: 1rem;
 }
 
 .action-btn.edit {
-    background: var(--primary-color);
+    background: #00b894;
+    color: white;
+}
+
+.action-btn.edit:hover {
+    background: #00a884;
+    transform: translateY(-2px);
 }
 
 .action-btn.delete {
-    background: var(--danger-color);
+    background: #ff7675;
+    color: white;
 }
 
-.action-btn:hover {
+.action-btn.delete:hover {
+    background: #d63031;
     transform: translateY(-2px);
-    opacity: 0.9;
 }
 
-/* Responsive Design */
+/* تنسيق متجاوب للجدول */
 @media (max-width: 768px) {
-    .page-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-    }
-
-    .back-btn,
-    .add-btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .modal-content {
-        margin: 5% auto;
-        padding: 20px;
-    }
-
     .table-container {
         overflow-x: auto;
     }
 
-    table {
+    #itemsTable {
         min-width: 600px;
+    }
+
+    #itemsTable th,
+    #itemsTable td {
+        padding: 12px 15px;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
     }
 }
 
@@ -572,7 +613,7 @@ tbody tr:hover {
     }
 }
 
-/* تنسيق صورة العنصر في الجدول */
+/* تنسيق صورة العن��ر في الجدول */
 .item-info {
     display: flex;
     align-items: center;
